@@ -174,11 +174,10 @@ func matchRule(torrent *qbittorrent.Torrent, rules []config.SeedingLimitsRule) (
 
 		if score > 0 {
 			action = rule.Action
-			log.Printf("[DEBUG] 规则 #%d 匹配成功，得分 %d %s, 设置动作为 %d\n", i, score, torrent.Name, rule.Action)
-		}
-		if limits == nil { // 修改这里，确保使用第一个匹配规则的limits
+			// 修复：确保使用当前匹配规则的limits参数
 			limits = rule.Limits
-			log.Printf("[DEBUG] 从规则 #%d 设置限制 %s\n", i, torrent.Name)
+			log.Printf("[DEBUG] 规则 #%d 匹配成功，得分 %d %s, 设置动作为 %d\n", i, score, torrent.Name, rule.Action)
+			log.Printf("[DEBUG] 从规则 #%d 设置限制 %s: %v\n", i, torrent.Name, limits)
 		}
 	}
 
@@ -195,7 +194,9 @@ func executeAction(torrent *qbittorrent.Torrent, action int, limits *config.Limi
 		_ = qbittorrent.Api.ResumeTorrents(torrent.Hash)
 		if limits == nil {
 			log.Printf("[DEBUG] 恢复种子 %s 无限制\n", torrent.Name)
-			break
+			log.Printf("[DEBUG] 完成动作0：恢复种子 %s\n", torrent.Name)
+			log.Printf("[DEBUG] 结束执行动作 %d %s\n", action, torrent.Name)
+			return
 		}
 		
 		// 只有当配置了相应的限制时才设置，否则保持原样
