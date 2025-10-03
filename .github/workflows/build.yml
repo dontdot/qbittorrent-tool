@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (optional)'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.19]
+        
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Build for different platforms
+      run: |
+        mkdir -p release
+        GOOS=linux GOARCH=amd64 go build -o release/qbittorrent-tool-linux-amd64 main.go
+        GOOS=windows GOARCH=amd64 go build -o release/qbittorrent-tool-windows-amd64.exe main.go
+        GOOS=darwin GOARCH=amd64 go build -o release/qbittorrent-tool-darwin-amd64 main.go
+        GOOS=darwin GOARCH=arm64 go build -o release/qbittorrent-tool-darwin-arm64 main.go
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: qbittorrent-tool-binaries
+        path: release/
