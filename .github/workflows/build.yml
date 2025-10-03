@@ -36,7 +36,7 @@ jobs:
         GOOS=darwin GOARCH=arm64 go build -o release/qbittorrent-tool-darwin-arm64 main.go
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: qbittorrent-tool-binaries
         path: release/
