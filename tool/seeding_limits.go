@@ -4,7 +4,6 @@ import (
 	"fengqi/qbittorrent-tool/config"
 	"fengqi/qbittorrent-tool/qbittorrent"
 	"fengqi/qbittorrent-tool/util"
-	"fmt"
 	"log"
 	"strings"
 	"time"
