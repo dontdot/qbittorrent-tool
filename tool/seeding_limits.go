@@ -20,20 +20,32 @@ func SeedingLimits(c *config.Config, torrent *qbittorrent.Torrent) {
 
 	action, limits := matchRule(torrent, c.SeedingLimits.Rules)
 	log.Printf("[DEBUG] 匹配规则 %s: 动作=%d\n", torrent.Name, action)
+	
+	// 如果匹配到规则，无论种子是否暂停都应该执行动作
+	if action == 0 && limits != nil {
+		log.Printf("[DEBUG] 应用限制到种子 %s\n", torrent.Name)
+		executeAction(torrent, action, limits)
+		return
+	}
+	
+	if action == 1 {
+		if strings.Contains(torrent.State, "paused") {
+			log.Printf("[DEBUG] 种子 %s 已暂停，跳过暂停动作\n", torrent.Name)
+			return
+		}
+		log.Printf("[DEBUG] 暂停种子 %s\n", torrent.Name)
+		executeAction(torrent, action, limits)
+		return
+	}
+
+	// 原有逻辑保留，但只在特定条件下执行
 	if action == 0 {
 		if !strings.Contains(torrent.State, "paused") || !c.SeedingLimits.Resume {
 			log.Printf("[DEBUG] 跳过恢复动作 %s: 已暂停=%v, 恢复设置=%v\n", torrent.Name, strings.Contains(torrent.State, "paused"), c.SeedingLimits.Resume)
 			return
 		}
+		executeAction(torrent, action, limits)
 	}
-
-	if action == 1 && strings.Contains(torrent.State, "paused") {
-		log.Printf("[DEBUG] 种子 %s 已暂停，跳过暂停动作\n", torrent.Name)
-		return
-	}
-
-	fmt.Printf("动作:%d %s\n", action, torrent.Name)
-	executeAction(torrent, action, limits)
 }
 
 // 规则至少有一个生效，且生效的全部命中，action才有效，后面的规则会覆盖前面的
@@ -160,7 +172,7 @@ func matchRule(torrent *qbittorrent.Torrent, rules []config.SeedingLimitsRule) (
 			action = rule.Action
 			log.Printf("[DEBUG] 规则 #%d 匹配成功，得分 %d %s, 设置动作为 %d\n", i, score, torrent.Name, rule.Action)
 		}
-		if action == 0 && limits == nil {
+		if limits == nil { // 修改这里，确保使用第一个匹配规则的limits
 			limits = rule.Limits
 			log.Printf("[DEBUG] 从规则 #%d 设置限制 %s\n", i, torrent.Name)
 		}
