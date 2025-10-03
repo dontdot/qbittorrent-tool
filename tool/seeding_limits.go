@@ -203,6 +203,7 @@ func executeAction(torrent *qbittorrent.Torrent, action int, limits *config.Limi
 
 		flag := false
 		radio := torrent.RatioLimit
+		log.Printf("[DEBUG] 检查当前limit参数 %s， %f， %d\n", limits.Ratio, limits.SeedingTime, limits.InactiveSeedingTime)
 		// 检查是否在配置中设置了Ratio限制（大于等于0表示设置了值，-1和-2是特殊值）
 		if limits.Ratio >= 0 && limits.Ratio != torrent.RatioLimit {
 			flag = true
