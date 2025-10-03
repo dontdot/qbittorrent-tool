@@ -188,6 +188,7 @@ func matchRule(torrent *qbittorrent.Torrent, rules []config.SeedingLimitsRule) (
 
 func executeAction(torrent *qbittorrent.Torrent, action int, limits *config.Limits) {
 	log.Printf("[DEBUG] 开始执行动作 %d %s\n", action, torrent.Name)
+	log.Printf("[DEBUG] limits参数 %v\n", limits)
 	switch action {
 	case 0:
 		log.Printf("[DEBUG] 执行动作0：恢复种子 %s\n", torrent.Name)
