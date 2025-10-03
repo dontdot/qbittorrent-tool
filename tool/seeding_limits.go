@@ -187,9 +187,10 @@ func matchRule(torrent *qbittorrent.Torrent, rules []config.SeedingLimitsRule) (
 }
 
 func executeAction(torrent *qbittorrent.Torrent, action int, limits *config.Limits) {
-	log.Printf("[DEBUG] 执行动作 %d %s\n", action, torrent.Name)
+	log.Printf("[DEBUG] 开始执行动作 %d %s\n", action, torrent.Name)
 	switch action {
 	case 0:
+		log.Printf("[DEBUG] 执行动作0：恢复种子 %s\n", torrent.Name)
 		_ = qbittorrent.Api.ResumeTorrents(torrent.Hash)
 		if limits == nil {
 			log.Printf("[DEBUG] 恢复种子 %s 无限制\n", torrent.Name)
@@ -232,27 +233,37 @@ func executeAction(torrent *qbittorrent.Torrent, action int, limits *config.Limi
 			_ = qbittorrent.Api.SetShareLimit(torrent.Hash, radio, seedingTimeLimit, inactiveSeedingTimeLimit)
 			log.Printf("[DEBUG] 更新分享限制 %s\n", torrent.Name)
 		}
-
+		
+		log.Printf("[DEBUG] 完成动作0：恢复种子 %s\n", torrent.Name)
 		break
 
 	case 1:
+		log.Printf("[DEBUG] 执行动作1：暂停种子 %s\n", torrent.Name)
 		_ = qbittorrent.Api.PauseTorrents(torrent.Hash)
-		log.Printf("[DEBUG] 暂停种子 %s\n", torrent.Name)
+		log.Printf("[DEBUG] 完成动作1：暂停种子 %s\n", torrent.Name)
 		break
 
 	case 2:
+		log.Printf("[DEBUG] 执行动作2：删除种子(不含文件) %s\n", torrent.Name)
 		_ = qbittorrent.Api.DeleteTorrents(torrent.Hash, false)
-		log.Printf("[DEBUG] 删除种子 %s (不含文件)\n", torrent.Name)
+		log.Printf("[DEBUG] 完成动作2：删除种子(不含文件) %s\n", torrent.Name)
 		break
 
 	case 3:
+		log.Printf("[DEBUG] 执行动作3：删除种子(含文件) %s\n", torrent.Name)
 		_ = qbittorrent.Api.DeleteTorrents(torrent.Hash, true)
-		log.Printf("[DEBUG] 删除种子 %s (含文件)\n", torrent.Name)
+		log.Printf("[DEBUG] 完成动作3：删除种子(含文件) %s\n", torrent.Name)
 		break
 
 	case 4:
+		log.Printf("[DEBUG] 执行动作4：启用超级做种 %s\n", torrent.Name)
 		_ = qbittorrent.Api.SetSuperSeeding(torrent.Hash, true)
-		log.Printf("[DEBUG] 启用超级做种 %s\n", torrent.Name)
+		log.Printf("[DEBUG] 完成动作4：启用超级做种 %s\n", torrent.Name)
 		break
+		
+	default:
+		log.Printf("[DEBUG] 未知动作 %d %s\n", action, torrent.Name)
 	}
+	
+	log.Printf("[DEBUG] 结束执行动作 %d %s\n", action, torrent.Name)
 }
