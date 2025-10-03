@@ -190,30 +190,35 @@ func executeAction(torrent *qbittorrent.Torrent, action int, limits *config.Limi
 			log.Printf("[DEBUG] 恢复种子 %s 无限制\n", torrent.Name)
 			break
 		}
-		if limits.Download != torrent.DlLimit {
+		
+		// 只有当配置了相应的限制时才设置，否则保持原样
+		if limits.Download > 0 {
 			_ = qbittorrent.Api.SetDownloadLimit(torrent.Hash, limits.Download)
 			log.Printf("[DEBUG] 设置下载限制 %s: %d\n", torrent.Name, limits.Download)
 		}
-		if limits.Upload != torrent.UpLimit {
-			_ = qbittorrent.Api.SetUploadLimit(torrent.Hash, limits.Download)
+		if limits.Upload > 0 {
+			_ = qbittorrent.Api.SetUploadLimit(torrent.Hash, limits.Upload)
 			log.Printf("[DEBUG] 设置上传限制 %s: %d\n", torrent.Name, limits.Upload)
 		}
 
 		flag := false
 		radio := torrent.RatioLimit
-		if limits.Ratio != torrent.RatioLimit {
+		// 检查是否在配置中设置了Ratio限制（大于等于0表示设置了值，-1和-2是特殊值）
+		if limits.Ratio >= 0 && limits.Ratio != torrent.RatioLimit {
 			flag = true
 			radio = limits.Ratio
 			log.Printf("[DEBUG] 分享率限制已更改 %s: %f -> %f\n", torrent.Name, torrent.RatioLimit, limits.Ratio)
 		}
 		seedingTimeLimit := torrent.SeedingTimeLimit
-		if limits.SeedingTime != torrent.SeedingTimeLimit {
+		// 检查是否在配置中设置了SeedingTime限制（大于等于0表示设置了值）
+		if limits.SeedingTime >= 0 && limits.SeedingTime != torrent.SeedingTimeLimit {
 			flag = true
 			seedingTimeLimit = limits.SeedingTime
 			log.Printf("[DEBUG] 做种时间限制已更改 %s: %d -> %d\n", torrent.Name, torrent.SeedingTimeLimit, limits.SeedingTime)
 		}
 		inactiveSeedingTimeLimit := torrent.InactiveSeedingTimeLimit
-		if limits.InactiveSeedingTime != torrent.InactiveSeedingTimeLimit {
+		// 检查是否在配置中设置了InactiveSeedingTime限制（大于等于0表示设置了值）
+		if limits.InactiveSeedingTime >= 0 && limits.InactiveSeedingTime != torrent.InactiveSeedingTimeLimit {
 			flag = true
 			inactiveSeedingTimeLimit = limits.InactiveSeedingTime
 			log.Printf("[DEBUG] 不活跃做种时间限制已更改 %s: %d -> %d\n", torrent.Name, torrent.InactiveSeedingTimeLimit, limits.InactiveSeedingTime)
