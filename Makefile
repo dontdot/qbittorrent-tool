@@ -1,45 +1,56 @@
+# Get version from git tag
+VERSION ?= $(shell git describe --tags --always --dirty)
 
-NAME=qbittorrent-tool
-VERSION=$(shell git describe --tags || echo "dev-master")
-RELEASE_DIR=release
-GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-w -s'
+# Python executable
+PYTHON ?= python3
 
-PLATFORM_LIST = \
-	darwin-amd64 \
-	darwin-arm64 \
-	linux-amd64
+# Default target
+.PHONY: all
+all: clean build
 
-WINDOWS_ARCH_LIST = windows-amd64
-
-all: linux-amd64 darwin-amd64 darwin-arm64 windows-amd64
-
-darwin-amd64:
-	GOARCH=amd64 GOOS=darwin $(GOBUILD) -o $(RELEASE_DIR)/$(NAME)-$@
-	cp example.config.json $(RELEASE_DIR)/
-
-darwin-arm64:
-	GOARCH=arm64 GOOS=darwin $(GOBUILD) -o $(RELEASE_DIR)/$(NAME)-$@
-	cp example.config.json $(RELEASE_DIR)/
-
-linux-amd64:
-	GOARCH=amd64 GOOS=linux $(GOBUILD) -o $(RELEASE_DIR)/$(NAME)-$@
-	cp example.config.json $(RELEASE_DIR)/
-
-windows-amd64:
-	GOARCH=amd64 GOOS=windows $(GOBUILD) -o $(RELEASE_DIR)/$(NAME)-$@.exe
-	cp example.config.json $(RELEASE_DIR)/
-
-gz_releases=$(addsuffix .gz, $(PLATFORM_LIST))
-zip_releases=$(addsuffix .zip, $(WINDOWS_ARCH_LIST))
-
-$(gz_releases): %.gz : %
-	chmod +x $(RELEASE_DIR)/$(NAME)-$(basename $@)
-	zip -m -j $(RELEASE_DIR)/$(NAME)-$(basename $@)-$(VERSION).zip $(RELEASE_DIR)/$(NAME)-$(basename $@) $(RELEASE_DIR)/example.config.json
-
-$(zip_releases): %.zip : %
-	zip -m -j $(RELEASE_DIR)/$(NAME)-$(basename $@)-$(VERSION).zip $(RELEASE_DIR)/$(NAME)-$(basename $@).exe $(RELEASE_DIR)/example.config.json
-
-release: $(gz_releases) $(zip_releases)
-
+# Clean build artifacts
+.PHONY: clean
 clean:
-	rm $(RELEASE_DIR)/*
+	rm -rf dist/
+	rm -rf build/
+	rm -rf *.egg-info/
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+
+# Install dependencies
+.PHONY: deps
+deps:
+	$(PYTHON) -m pip install -r requirements.txt
+
+# Install pyinstaller for building executable
+.PHONY: deps-build
+deps-build:
+	$(PYTHON) -m pip install pyinstaller
+
+# Build executable using pyinstaller
+.PHONY: build
+build: deps deps-build
+	$(PYTHON) -m PyInstaller pyinstaller.spec
+
+# Install the package in development mode
+.PHONY: dev-install
+dev-install:
+	$(PYTHON) -m pip install -e .
+
+# Run the tool directly with Python
+.PHONY: run
+run:
+	$(PYTHON) main.py
+
+# Help information
+.PHONY: help
+help:
+	@echo "Available targets:"
+	@echo "  all          - Clean and build executable (default)"
+	@echo "  clean        - Remove build artifacts"
+	@echo "  deps         - Install Python dependencies"
+	@echo "  deps-build   - Install build dependencies (pyinstaller)"
+	@echo "  build        - Build executable using pyinstaller"
+	@echo "  dev-install  - Install package in development mode"
+	@echo "  run          - Run the tool directly with Python"
+	@echo "  help         - Show this help message"
