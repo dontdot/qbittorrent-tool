@@ -12,16 +12,16 @@ WINDOWS_ARCH_LIST = windows-amd64
 
 # Default target
 .PHONY: all
-all: clean package
+all: clean build-exe
 
 # Clean build artifacts
 .PHONY: clean
 clean:
 	if exist dist rmdir /s /q dist 2>nul || rm -rf dist 2>/dev/null || true
 	if exist build rmdir /s /q build 2>nul || rm -rf build 2>/dev/null || true
-	for /d %i in (*.egg-info) do if exist "%i" rmdir /s /q "%i" 2>nul || rm -rf *.egg-info 2>/dev/null || true
+	for /d %%i in (*.egg-info) do if exist "%%i" rmdir /s /q "%%i" 2>nul || rm -rf *.egg-info 2>/dev/null || true
 	del /q *.pyc 2>nul || rm -f *.pyc 2>/dev/null || true
-	for /d /r . %%i in (__pycache__) do @if exist "%%i" rmdir /s /q "%%i" 2>nul || find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	for /d /r . %%j in (__pycache__) do @if exist "%%j" rmdir /s /q "%%j" 2>nul || find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 
 # Install dependencies
 .PHONY: deps
@@ -39,7 +39,7 @@ deps:
 # Install build dependencies
 .PHONY: deps-build
 deps-build:
-	$(PYTHON) -m pip install pyinstaller build
+	$(PYTHON) -m pip install pyinstaller
 
 # Platform-specific builds
 .PHONY: windows-amd64
@@ -80,11 +80,6 @@ build-exe: deps deps-build
 		cp example.config.json dist/ \
 	)
 
-# Build Python package
-.PHONY: package
-package: deps deps-build
-	$(PYTHON) -m build
-
 # Install the package in development mode
 .PHONY: dev-install
 dev-install:
@@ -116,30 +111,20 @@ release: clean deps deps-build
 		cp example.config.json $(RELEASE_DIR)/ \
 	)
 	
-	# Package as wheel and source distribution
-	$(PYTHON) -m build
-	@if exist dist ( \
-		if exist dist\*.whl copy dist\*.whl $(RELEASE_DIR)\ \
-		if exist dist\*.tar.gz copy dist\*.tar.gz $(RELEASE_DIR)\ \
-	) else ( \
-		cp dist/*.whl $(RELEASE_DIR)/ 2>/dev/null || true \
-		cp dist/*.tar.gz $(RELEASE_DIR)/ 2>/dev/null || true \
-	)
 
 # Help information
 .PHONY: help
 help:
 	@echo Available targets:
-	@echo   all             - Clean and build package (default)
+	@echo   all             - Clean and build executable (default)
 	@echo   clean           - Remove build artifacts
 	@echo   deps            - Install Python dependencies
-	@echo   deps-build      - Install build dependencies (pyinstaller, build)
+	@echo   deps-build      - Install build dependencies (pyinstaller)
 	@echo   windows-amd64   - Build for Windows
 	@echo   linux-amd64     - Build for Linux
 	@echo   darwin-amd64    - Build for macOS Intel
 	@echo   darwin-arm64    - Build for macOS Apple Silicon
 	@echo   build-exe       - Build executable using pyinstaller for current platform
-	@echo   package         - Build Python package (wheel and source distribution)
 	@echo   dev-install     - Install package in development mode
 	@echo   run             - Run the tool directly with Python
 	@echo   release         - Create release builds for current platform

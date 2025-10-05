@@ -1,12 +1,6 @@
-name: Build Multi-Platform Releases
+name: Build Multi-Platform Executables
 
 on:
-  push:
-    branches: [ py ]
-    tags:
-      - 'v*'
-  pull_request:
-    branches: [ py ]
   workflow_dispatch:
 
 jobs:
