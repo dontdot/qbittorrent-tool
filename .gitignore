@@ -4,6 +4,8 @@
 *.dll
 *.so
 *.dylib
+*.pyc
+*.log
 
 # Test binary, built with `go test -c`
 *.test
@@ -17,3 +19,9 @@
 .idea
 config.json
 release
+
+.vscode
+venv
+build
+dist
+/__pycache__/

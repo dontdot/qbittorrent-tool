@@ -1,64 +1,38 @@
 # qbittorrent-tool
+qbittorrent 辅助工具
 
-一个用于管理 qBittorrent 的工具，支持自动分类、标签设置、做种限制等功能。
+# 怎么使用
 
-## 功能特性
+根据平台下载对应的 release 文件，复制 example.config.json 为 config.json，修改 qbittorrent 的配置信息以及自定义标签、分类映射。
 
-- 根据 tracker 域名自动设置标签（如 baidu.com）
-- 根据种子保存路径自动设置分类
-- 基于标签、分类、tracker、关键词等条件精确控制做种时间、分享率、上传速度，并支持删种或例外保种
-- 根据 tracker 工作状态（尤其是错误状态）自动添加标签以便识别问题
-- 批量替换 tracker（待实现）
+使用`设置-下载-运行外部程序`或定时任务运行。
 
-## 安装
+# 1. 根据tracker域名设置标签
 
-```bash
-# 克隆项目
-git clone https://github.com/fengqi/qbittorrent-tool.git
-cd qbittorrent-tool
+根据`tracker`地址给种子设置标签，如 `https://tracker.baidu.com/announce.php` 则设置标签为 `baidu.com`。
 
-# 安装依赖
-pip install -r requirements.txt
-```
+如果需要自定义标签，需要在 config.json 配置好对应关系，已经存在的标签不会自动删除，可在 webui 右键删除，等待种子再次被处理。
 
-## 使用方法
+# 2. 自动设置分类
 
-```bash
-# 直接运行
-python main.py
+根据种子保存路径设置分类，需要在 `config.json` 配置好对应关系，获取不到对应关系的种子不会被处理。
 
-# 或者安装后运行
-pip install -e .
-qbittorrent-tool
-```
+# 3. 自动控制做种时间、分享率、速度
 
-### 打包为可执行文件
+扩展自带的`做种限制`功能，增加根据标签、分类、tracker、关键字精确限制停止做种、删种、例外继续保种等。
 
-```bash
-# 安装打包工具
-pip install pyinstaller
+可配置多组规则，按顺序处理，后面的会覆盖前面的，一组规则里的所有规则都不生效时整租规则视为无效。
 
-# 打包
-make build
+对于不启用的规则，可以将字段删除，以保持规则精炼和高效识别，详情参考配置文件和[Wiki](https://github.com/fengqi/qbittorrent-tool/wiki/%E8%87%AA%E5%8A%A8%E6%8E%A7%E5%88%B6%E5%81%9A%E7%A7%8D%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E)。
 
-# 或者直接使用 pyinstaller
-pyinstaller pyinstaller.spec
-```
+# 4. 根据tracker工作状态设置标签
 
-打包后的可执行文件位于 `dist/` 目录中。
+根据种子的tracker返回的状态设置标签，目前已有的状态有：关闭(不支持的协议如DHT)、正常、更新中、未开始工作(暂停的种子)、出错(原因五花八门)。
 
-## 配置文件
+其中只有出错需要额外关心，然而出错的原因五花八门状态却都是4，所以需要提前配置错误信息对应的标签，已发现未配置的错误信息会在处理结果种给出，如果不想设置标签又不想在处理结果种显示可以配置为空。
 
-请参考 `example.config.json` 创建你的配置文件，并使用 `-c` 参数指定配置文件路径：
+已经存在的标签不会自动删除，可在 webui 右键删除，等待种子再次被处理。
 
-```bash
-python main.py -c ./config.json
-```
+# 5. 批量替换tracker
 
-## 技术栈
-
-Python 3.6+
-
-## 许可证
-
-MIT
+todo
