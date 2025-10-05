@@ -26,24 +26,31 @@ clean:
 # Install dependencies
 .PHONY: deps
 deps:
-	@(if exist requirements.txt ( \
-		(if exist uv.lock ( \
-			uv pip install -r requirements.txt \
-		) else ( \
-			$(PYTHON) -m pip install -r requirements.txt \
-		)) \
-	) else ( \
-		echo "No requirements.txt found, using pyproject.toml" \
-	)) || \
-	(if [ -f requirements.txt ]; then \
-		if [ -f uv.lock ]; then \
+	@echo "Installing dependencies..."
+	@if [ -f "requirements.txt" ]; then \
+		if [ -f "uv.lock" ]; then \
+			echo "Using uv to install dependencies"; \
 			uv pip install -r requirements.txt; \
 		else \
+			echo "Using pip to install dependencies"; \
 			$(PYTHON) -m pip install -r requirements.txt; \
-		fi \
+		fi; \
 	else \
 		echo "No requirements.txt found, using pyproject.toml"; \
-	fi)
+	fi; \
+	if [ "$$(uname)" = "Linux" ] || [ "$$(uname)" = "Darwin" ]; then \
+		echo "Running on Unix-like system"; \
+	else \
+		if [ -f "requirements.txt" ]; then \
+			if [ -f "uv.lock" ]; then \
+				uv pip install -r requirements.txt; \
+			else \
+				$(PYTHON) -m pip install -r requirements.txt; \
+			fi; \
+		else \
+			echo "No requirements.txt found, using pyproject.toml"; \
+		fi; \
+	fi
 
 # Install build dependencies
 .PHONY: deps-build
