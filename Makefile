@@ -26,7 +26,7 @@ clean:
 # Install dependencies
 .PHONY: deps
 deps:
-	if exist requirements.txt ( \
+	@(if exist requirements.txt ( \
 		(if exist uv.lock ( \
 			uv pip install -r requirements.txt \
 		) else ( \
@@ -34,7 +34,16 @@ deps:
 		)) \
 	) else ( \
 		echo "No requirements.txt found, using pyproject.toml" \
-	)
+	)) || \
+	(if [ -f requirements.txt ]; then \
+		if [ -f uv.lock ]; then \
+			uv pip install -r requirements.txt; \
+		else \
+			$(PYTHON) -m pip install -r requirements.txt; \
+		fi \
+	else \
+		echo "No requirements.txt found, using pyproject.toml"; \
+	fi)
 
 # Install build dependencies
 .PHONY: deps-build
@@ -110,7 +119,6 @@ release: clean deps deps-build
 		cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$$(uname -s | tr '[:upper:]' '[:lower:]')-$$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/') \
 		cp example.config.json $(RELEASE_DIR)/ \
 	)
-	
 
 # Help information
 .PHONY: help
