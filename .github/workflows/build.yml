@@ -31,9 +31,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: windows-executable
-        path: |
-          release/qbittorrent-tool-windows-amd64.exe
-          release/example.config.json
+        path: release/*
 
   build-linux:
     runs-on: ubuntu-latest
@@ -62,9 +60,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: linux-executable
-        path: |
-          release/qbittorrent-tool-linux-amd64
-          release/example.config.json
+        path: release/
 
   build-macos-intel:
     runs-on: macos-13  # Intel mac
@@ -93,9 +89,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: macos-intel-executable
-        path: |
-          release/qbittorrent-tool-darwin-amd64
-          release/example.config.json
+        path: release/
 
   build-macos-arm:
     runs-on: macos-14  # Apple Silicon mac
@@ -124,9 +118,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: macos-arm-executable
-        path: |
-          release/qbittorrent-tool-darwin-arm64
-          release/example.config.json
+        path: release/
 
   create-release:
     needs: [build-windows, build-linux, build-macos-intel, build-macos-arm]
