@@ -20,31 +20,31 @@ all: $(ZIP_RELEASES)
 # Platform-specific builds
 .PHONY: windows-amd64
 windows-amd64: deps deps-build
-	if not exist $(RELEASE_DIR) mkdir $(RELEASE_DIR)
+	@if [ ! -d "$(RELEASE_DIR)" ]; then mkdir $(RELEASE_DIR); fi
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	copy dist\$(NAME).exe $(RELEASE_DIR)\$(NAME)-$@.exe
-	copy example.config.json $(RELEASE_DIR)\
+	@cp dist/$(NAME).exe $(RELEASE_DIR)/$(NAME)-$@.exe
+	@cp example.config.json $(RELEASE_DIR)/
 
 .PHONY: linux-amd64
 linux-amd64: deps deps-build
 	mkdir -p $(RELEASE_DIR)
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
-	cp example.config.json $(RELEASE_DIR)/
+	@cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
+	@cp example.config.json $(RELEASE_DIR)/
 
 .PHONY: darwin-amd64
 darwin-amd64: deps deps-build
 	mkdir -p $(RELEASE_DIR)
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
-	cp example.config.json $(RELEASE_DIR)/
+	@cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
+	@cp example.config.json $(RELEASE_DIR)/
 
 .PHONY: darwin-arm64
 darwin-arm64: deps deps-build
 	mkdir -p $(RELEASE_DIR)
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
-	cp example.config.json $(RELEASE_DIR)/
+	@cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
+	@cp example.config.json $(RELEASE_DIR)/
 
 # Rules for creating .zip releases for all platforms
 .PHONY: $(ZIP_RELEASES)
