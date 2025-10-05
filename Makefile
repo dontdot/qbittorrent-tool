@@ -19,7 +19,7 @@ all: clean package
 clean:
 	if exist dist rmdir /s /q dist 2>nul || rm -rf dist 2>/dev/null || true
 	if exist build rmdir /s /q build 2>nul || rm -rf build 2>/dev/null || true
-	if exist *.egg-info for /d %i in (*.egg-info) do rmdir /s /q "%i" 2>nul || rm -rf *.egg-info 2>/dev/null || true
+	for /d %i in (*.egg-info) do if exist "%i" rmdir /s /q "%i" 2>nul || rm -rf *.egg-info 2>/dev/null || true
 	del /q *.pyc 2>nul || rm -f *.pyc 2>/dev/null || true
 	for /d /r . %%i in (__pycache__) do @if exist "%%i" rmdir /s /q "%%i" 2>nul || find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 
