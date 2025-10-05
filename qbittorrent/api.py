@@ -14,6 +14,12 @@ class Torrent:
         self.name = data.get('name', '')
         self.tracker = data.get('tracker', '')
         self.tags = data.get('tags', '')
+        self.category = data.get('category', '')
+        self.seeds = data.get('nb_seeders', 0)
+        self.ratio = data.get('ratio', 0.0)
+        self.seeding_time = data.get('seeding_time', 0)  # 秒
+        self.activity_time = data.get('last_activity', 0)  # 时间戳
+        self.save_path = data.get('save_path', '')
         # 可以根据需要添加更多字段
         
     def get_tracker_host(self) -> str:
@@ -30,6 +36,8 @@ class Torrent:
 class Tracker:
     def __init__(self, data: Dict[str, Any]):
         self.url = data.get('url', '')
+        self.status = data.get('status', 0)
+        self.msg = data.get('msg', '')
         # 可以根据需要添加更多字段
 
 class QBittorrentAPI:

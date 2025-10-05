@@ -27,12 +27,18 @@ class StatusTag:
         for tracker in trackers:
             # 检查tracker状态消息是否匹配配置的映射
             for status_msg, tag in self.config.map_config.items():
-                if status_msg in tracker.url:
+                if status_msg in tracker.msg:
                     # 如果配置中的标签为空字符串，则移除对应标签
                     if tag == "":
                         # 移除标签的实现
                         logger.debug(f"应该移除种子 {torrent.name} 的标签，基于状态: {status_msg}")
                     else:
+                        # 检查标签是否已存在
+                        existing_tags = [t.strip() for t in torrent.tags.split(',')] if torrent.tags else []
+                        if tag in existing_tags:
+                            logger.debug(f"状态标签 {tag} 已存在于种子 {torrent.name} 中，跳过")
+                            continue
+                            
                         # 添加标签
                         try:
                             self.qb_api.add_tags(torrent.hash, tag)

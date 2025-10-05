@@ -56,14 +56,39 @@ class SeedingLimits:
             if not category_matched:
                 return False
                 
+        # 检查tracker匹配
+        if rule.tracker and hasattr(torrent, 'tracker'):
+            tracker_matched = any(tracker in torrent.tracker for tracker in rule.tracker)
+            if not tracker_matched:
+                return False
+                
         # 检查关键词匹配
         if rule.keyword:
             keyword_matched = any(keyword in torrent.name for keyword in rule.keyword)
             if not keyword_matched:
                 return False
                 
+        # 检查种子数大于条件
+        if rule.seeds_gt > 0 and hasattr(torrent, 'seeds') and torrent.seeds <= rule.seeds_gt:
+            return False
+            
+        # 检查种子数小于条件
+        if rule.seeds_lt > 0 and hasattr(torrent, 'seeds') and torrent.seeds >= rule.seeds_lt:
+            return False
+            
+        # 检查分享率条件
+        if rule.ratio > 0 and hasattr(torrent, 'ratio') and torrent.ratio < rule.ratio:
+            return False
+            
+        # 检查做种时间条件（转换为分钟）
+        if rule.seeding_time > 0 and hasattr(torrent, 'seeding_time') and torrent.seeding_time < rule.seeding_time * 60:
+            return False
+            
+        # 检查活动时间条件（转换为分钟）
+        if rule.activity_time > 0 and hasattr(torrent, 'activity_time') and torrent.activity_time < rule.activity_time * 60:
+            return False
+            
         # 其他匹配条件可以根据需要添加
-        # 这里为了简化只实现了标签、分类和关键词匹配
         
         return True
         
