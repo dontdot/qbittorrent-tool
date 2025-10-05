@@ -20,47 +20,47 @@ all: $(ZIP_RELEASES)
 # Platform-specific builds
 .PHONY: windows-amd64
 windows-amd64: deps deps-build
-	@if [ ! -d "$(RELEASE_DIR)" ]; then mkdir $(RELEASE_DIR); fi
+	$(PYTHON) -c "import os; os.makedirs('$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)', exist_ok=True)"
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	@cp dist/$(NAME).exe $(RELEASE_DIR)/$(NAME)-$@.exe
-	@cp example.config.json $(RELEASE_DIR)/
+	$(PYTHON) -c "import shutil; shutil.copy('dist/$(NAME).exe', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/$(NAME)-$@-$(VERSION).exe')"
+	$(PYTHON) -c "import shutil; shutil.copy('example.config.json', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)')"
 
 .PHONY: linux-amd64
 linux-amd64: deps deps-build
-	mkdir -p $(RELEASE_DIR)
+	$(PYTHON) -c "import os; os.makedirs('$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)', exist_ok=True)"
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	@cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
-	@cp example.config.json $(RELEASE_DIR)/
+	$(PYTHON) -c "import shutil; shutil.copy('dist/$(NAME)', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/$(NAME)-$@-$(VERSION)')"
+	$(PYTHON) -c "import shutil; shutil.copy('example.config.json', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)')"
 
 .PHONY: darwin-amd64
 darwin-amd64: deps deps-build
-	mkdir -p $(RELEASE_DIR)
+	$(PYTHON) -c "import os; os.makedirs('$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)', exist_ok=True)"
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	@cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
-	@cp example.config.json $(RELEASE_DIR)/
+	$(PYTHON) -c "import shutil; shutil.copy('dist/$(NAME)', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/$(NAME)-$@-$(VERSION)')"
+	$(PYTHON) -c "import shutil; shutil.copy('example.config.json', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)')"
 
 .PHONY: darwin-arm64
 darwin-arm64: deps deps-build
-	mkdir -p $(RELEASE_DIR)
+	$(PYTHON) -c "import os; os.makedirs('$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)', exist_ok=True)"
 	$(PYTHON) -m PyInstaller --onefile main.py --name $(NAME)
-	@cp dist/$(NAME) $(RELEASE_DIR)/$(NAME)-$@
-	@cp example.config.json $(RELEASE_DIR)/
+	$(PYTHON) -c "import shutil; shutil.copy('dist/$(NAME)', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/$(NAME)-$@-$(VERSION)')"
+	$(PYTHON) -c "import shutil; shutil.copy('example.config.json', '$(RELEASE_DIR)/$(NAME)-$@-$(VERSION)')"
 
 # Rules for creating .zip releases for all platforms
 .PHONY: $(ZIP_RELEASES)
 $(ZIP_RELEASES): %.zip : %
-	@if [ -f "$(RELEASE_DIR)/$(NAME)-$(basename $@).exe" ]; then \
-		zip -j $(RELEASE_DIR)/$(NAME)-$(basename $@)-$(VERSION).zip $(RELEASE_DIR)/$(NAME)-$(basename $@).exe $(RELEASE_DIR)/example.config.json; \
+	if [ -f "$(RELEASE_DIR)/$(NAME)-$@.exe" ]; then \
+		zip -j $(RELEASE_DIR)/$(NAME)-$@-$(VERSION).zip $(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/$(NAME)-$@-$(VERSION).exe $(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/example.config.json; \
 	else \
-		chmod +x $(RELEASE_DIR)/$(NAME)-$(basename $@); \
-		zip -j $(RELEASE_DIR)/$(NAME)-$(basename $@)-$(VERSION).zip $(RELEASE_DIR)/$(NAME)-$(basename $@) $(RELEASE_DIR)/example.config.json; \
+		chmod +x $(RELEASE_DIR)/$(NAME)-$@; \
+		zip -j $(RELEASE_DIR)/$(NAME)-$@-$(VERSION).zip $(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/$(NAME)-$@-$(VERSION) $(RELEASE_DIR)/$(NAME)-$@-$(VERSION)/example.config.json; \
 	fi
 
 # Install dependencies
 .PHONY: deps
 deps:
-	@echo "Installing dependencies..."
-	@if [ -f "requirements.txt" ]; then \
+	echo "Installing dependencies..."
+	if [ -f "requirements.txt" ]; then \
 		echo "Found requirements.txt, installing dependencies with pip..."; \
 		$(PYTHON) -m pip install -r requirements.txt; \
 	else \

@@ -17,11 +17,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-    #     pip install -r requirements.txt
-
-    # - name: Install build dependencies
-    #   run: |
-    #     pip install pyinstaller
 
     - name: Build executable with Makefile
       run: |
@@ -30,6 +25,7 @@ jobs:
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
       with:
+        name: qbittorrent-tool-windows-amd64
         path: release/
 
   build-linux:
@@ -45,19 +41,15 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-    #     if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    # - name: Install build dependencies
-    #   run: |
-    #     pip install pyinstaller
 
     - name: Build executable with Makefile
       run: |
         make linux-amd64
 
-    - name: Upload Linux artifacts
+    - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
       with:
+        name: qbittorrent-tool-linux-amd64
         path: release/
 
   build-macos-intel:
@@ -73,19 +65,15 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-    #     if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    # - name: Install build dependencies
-    #   run: |
-    #     pip install pyinstaller
 
     - name: Build executable with Makefile
       run: |
         make darwin-amd64
 
-    - name: Upload macOS Intel artifacts
+    - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
       with:
+        name: qbittorrent-tool-darwin-amd64
         path: release/
 
   build-macos-arm:
@@ -101,17 +89,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-    #     if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-    # - name: Install build dependencies
-    #   run: |
-    #     pip install pyinstaller
 
     - name: Build executable with Makefile
       run: |
         make darwin-arm64
 
-    - name: Upload macOS ARM artifacts
+    - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
       with:
+        name: qbittorrent-tool-darwin-arm64
         path: release/
