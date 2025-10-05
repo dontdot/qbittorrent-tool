@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import logging
 from typing import List
 from qbittorrent.api import QBittorrentAPI, Torrent, Tracker
-from config.config import DomainTagConfig
+from config.config import DomainTagConfig, get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 class DomainTag:
     def __init__(self, qb_api: QBittorrentAPI, config: DomainTagConfig):

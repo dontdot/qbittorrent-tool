@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import logging
+from config.config import get_logger
 from qbittorrent.api import QBittorrentAPI, Torrent
 from config.config import SeedingLimitsConfig, SeedingLimitsRule
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 class SeedingLimits:
     def __init__(self, qb_api: QBittorrentAPI, config: SeedingLimitsConfig):

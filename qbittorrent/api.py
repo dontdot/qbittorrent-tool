@@ -5,8 +5,9 @@ import requests
 import logging
 from typing import Dict, List, Any, Optional
 from urllib.parse import urljoin
+from config.config import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 class Torrent:
     def __init__(self, data: Dict[str, Any]):

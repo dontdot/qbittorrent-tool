@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import logging
+from config.config import get_logger
 from qbittorrent.api import QBittorrentAPI, Torrent, Tracker
 from config.config import StatusTagConfig
 
-logger = logging.getLogger(__name__)
+logger = get_logger()
 
 class StatusTag:
     def __init__(self, qb_api: QBittorrentAPI, config: StatusTagConfig):

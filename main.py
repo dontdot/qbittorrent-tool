@@ -9,48 +9,12 @@ import time
 import os
 from typing import Dict, List, Any
 
-from config.config import Config
+from config.config import Config, setup_logger
 from qbittorrent.api import QBittorrentAPI
 from tools.auto_category import AutoCategory
 from tools.domain_tag import DomainTag
 from tools.seeding_limits import SeedingLimits
 from tools.status_tag import StatusTag
-
-# 设置日志
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-# 创建日志格式
-formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(filename)s:%(lineno)d - %(message)s')
-
-# 创建控制台处理器
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setLevel(logging.DEBUG)
-console_handler.setFormatter(formatter)
-
-# 创建文件处理器
-file_handler = None
-
-def setup_logging(log_file: str):
-    global file_handler
-    # 创建文件处理器
-    file_handler = logging.FileHandler(log_file, encoding='utf-8')
-    file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(formatter)
-    
-    # 添加处理器到日志记录器
-    logger.addHandler(console_handler)
-    logger.addHandler(file_handler)
-
-def load_config(config_file: str) -> Config:
-    """加载配置文件"""
-    try:
-        with open(config_file, 'r', encoding='utf-8') as f:
-            config_data = json.load(f)
-        return Config(config_data)
-    except Exception as e:
-        logger.error(f"加载配置错误: {e}")
-        raise
 
 def main():
     parser = argparse.ArgumentParser(description='qBittorrent Tool')
@@ -59,8 +23,8 @@ def main():
     
     args = parser.parse_args()
     
-    # 设置日志
-    setup_logging(args.log_file)
+    # 设置全局日志记录器
+    logger = setup_logger(args.log_file)
     
     try:
         # 加载配置
@@ -119,6 +83,17 @@ def main():
     except Exception as e:
         logger.error(f"程序执行出错: {e}")
         sys.exit(1)
+
+def load_config(config_file: str) -> Config:
+    """加载配置文件"""
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        return Config(config_data)
+    except Exception as e:
+        # 在logger初始化前，使用print输出错误
+        print(f"加载配置错误: {e}")
+        raise
 
 if __name__ == "__main__":
     main()
